@@ -22,7 +22,7 @@ jobs:
       
       - name: install dependencies
         run: |
-          sudo apt-get update && sudo apt-get fakechroot wget tar e2fsprogs python3 -y
+          sudo apt-get update && sudo apt-get install fakechroot wget tar e2fsprogs python3 -y
       
       - name: Prepare environment
         run: |
