@@ -1,0 +1,90 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get fakechroot wget tar e2fsprogs python3 -y
+      
+      - name: Prepare environment
+        run: |
+          mkdir -p /tmp/rootfs
+          mkdir -p /tmp/webfs
+          wget -O "/tmp/alpine.tar.gz" "$ALPINE_BASE_URL"
+          tar -xf "/tmp/alpine.tar.gz" -C "/tmp/rootfs"
+          cp ./build/bin/* "/tmp/rootfs/bin/"
+      
+      - name: Customize rootfs
+        run: |
+          fakechroot "/tmp/rootfs/" /bin/sh /bin/install
+      
+      - name: Convert to ext2 filesystem file
+        run: |
+          dd if=/dev/zero of="/tmp/filesystem.img" bs=1M count=512
+          mke2fs -t ext2 -d "/tmp/rootfs" "/tmp/filesystem.img"
+      
+      - name: Split filesystem
+        run: |
+          cat << EOF | python3
+          chunk_count = 0
+          with open("/tmp/filesystem.img", 'rb') as f:
+              chunk_index = 0
+              while True:
+                  chunk = f.read(2048 * 1024)
+
+                  if not chunk:
+                      break
+
+                  with open(f"/tmp/webfs/blk{chunk_index:09d}.bin", 'wb') as chunk_file:
+                      chunk_file.write(chunk)
+
+                  chunk_index += 1
+
+              chunk_count = chunk_index
+          with open("/tmp/webfs/blk.txt", "w") as f:
+              f.write("{\n")
+              f.write(f"  block_size: 2048,\n")
+              f.write(f"  n_block: {chunk_count},\n")
+              f.write("}")
+          EOF
+          cp /tmp/webfs/* ./deploy/linux/root-x86/
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./deploy/linux/
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
