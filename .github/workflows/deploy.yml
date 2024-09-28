@@ -65,6 +65,7 @@ jobs:
               f.write(f"  n_block: {chunk_count},\n")
               f.write("}")
           EOF
+          mkdir -p ./deploy/linux/root-x86/
           cp /tmp/webfs/* ./deploy/linux/root-x86/
       
       - name: Upload artifact
