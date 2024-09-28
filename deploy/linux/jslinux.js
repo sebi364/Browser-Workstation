@@ -552,8 +552,13 @@ function start_vm(user, pwd)
     graphic_enable = params["graphic"] | 0;
     net_url = params["net_url"]; /* empty string means no network */
     let protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    if (typeof net_url == "undefined")
-        net_url = `${protocol}${window.location.host}/relay/`;
+    if (typeof net_url == "undefined") {
+        if (window.location.host.includes("github")) {
+            net_url = 'wss://relay.widgetry.org/';
+        } else {
+            net_url = `${protocol}${window.location.host}/relay/`;
+        }
+    }    
     drive_url = params["drive_url"] || "";
 
     if (user) {
