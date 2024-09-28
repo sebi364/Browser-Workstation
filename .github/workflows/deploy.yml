@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir -p /tmp/rootfs
           mkdir -p /tmp/webfs
-          wget -O "/tmp/alpine.tar.gz" "$ALPINE_BASE_URL"
+          wget -O "/tmp/alpine.tar.gz" "https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/x86/alpine-minirootfs-3.20.3-x86.tar.gz"
           tar -xf "/tmp/alpine.tar.gz" -C "/tmp/rootfs"
           cp ./build/bin/* "/tmp/rootfs/bin/"
       
