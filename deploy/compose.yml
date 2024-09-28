@@ -1,0 +1,11 @@
+services:
+  proxy:
+    build: websockproxy/.
+    privileged: true
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./linux/:/usr/share/nginx/html/
+      - ./nginx.conf:/etc/nginx/nginx.conf

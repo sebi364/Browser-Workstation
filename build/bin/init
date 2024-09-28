@@ -1,0 +1,24 @@
+#!/bin/bash
+export HOME=/root
+export TERM=linux
+
+# mount stuff
+mount -a
+mount -o remount,rw /
+
+# hostname
+hostname "just-alpine"
+ 
+ifconfig lo 127.0.0.1
+
+# get dhcp
+dhcpcd -q
+
+# shell
+cd $HOME
+
+# shell
+ttyname=`cat /sys/class/tty/console/active`
+while /bin/true; do
+  setsid sh -c "exec bash < /dev/$ttyname > /dev/$ttyname 2>&1"
+done
