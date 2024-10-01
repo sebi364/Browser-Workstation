@@ -49,4 +49,4 @@ sudo rm -rf "$BUILD_DIR/filesystem.img"
 
 # move linux into html dir
 mkdir ../deploy/linux/root-x86/
-cp $BUILD_DIR/weblinux/* ../deploy/linux/root-x86/
+cp $BUILD_DIR/webfs/* ../deploy/linux/root-x86/
