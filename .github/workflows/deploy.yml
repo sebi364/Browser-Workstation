@@ -23,6 +23,11 @@ jobs:
         run: |
           cd build
           sudo ./buildlinux.sh
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./deploy/linux/
 
   deploy:
     needs: build
