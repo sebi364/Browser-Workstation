@@ -22,7 +22,7 @@ jobs:
       - name: Run Buildscript
         run: |
           cd build
-          ./buildlinux.sh
+          sudo ./buildlinux.sh
 
   deploy:
     needs: build
