@@ -1,5 +1,6 @@
+#!/usr/bin/bash
 ALPINE_BASE_URL="https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/x86/alpine-minirootfs-3.20.3-x86.tar.gz"
-BUILD_DIR="/tmp/mylinux"
+BUILD_DIR="/tmp/weblinux"
 CHUNK_SIZE=2048
 
 # preparation

@@ -15,63 +15,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      
       - name: install dependencies
         run: |
           sudo apt-get update && sudo apt-get install wget tar e2fsprogs python3 -y
       
-      - name: Prepare environment
+      - name: Run Buildscript
         run: |
-          mkdir -p /tmp/rootfs
-          mkdir -p /tmp/webfs
-          wget -O "/tmp/alpine.tar.gz" "https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/x86/alpine-minirootfs-3.20.3-x86.tar.gz"
-          tar -xf "/tmp/alpine.tar.gz" -C "/tmp/rootfs"
-          cp ./build/bin/* "/tmp/rootfs/bin/"
-      
-      - name: Customize rootfs
-        run: |
-          sudo chroot "/tmp/rootfs/" /bin/sh /bin/install
-      
-      - name: Convert to ext2 filesystem file
-        run: |
-          dd if=/dev/zero of="/tmp/filesystem.img" bs=1M count=512
-          mke2fs -t ext2 -d "/tmp/rootfs" "/tmp/filesystem.img"
-      
-      - name: Split filesystem
-        run: |
-          cat << EOF | python3
-          chunk_count = 0
-          with open("/tmp/filesystem.img", 'rb') as f:
-              chunk_index = 0
-              while True:
-                  chunk = f.read(2048 * 1024)
-
-                  if not chunk:
-                      break
-
-                  with open(f"/tmp/webfs/blk{chunk_index:09d}.bin", 'wb') as chunk_file:
-                      chunk_file.write(chunk)
-
-                  chunk_index += 1
-
-              chunk_count = chunk_index
-          with open("/tmp/webfs/blk.txt", "w") as f:
-              f.write("{\n")
-              f.write(f"  block_size: 2048,\n")
-              f.write(f"  n_block: {chunk_count},\n")
-              f.write("}")
-          EOF
-          mkdir -p ./deploy/linux/root-x86/
-          cp /tmp/webfs/* ./deploy/linux/root-x86/
-      
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./deploy/linux/
+          cd build
+          ./buildlinux.sh
 
   deploy:
     needs: build
