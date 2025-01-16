@@ -33,6 +33,7 @@ chmod +x /etc/init.d/shell
 rc-update add sshd default
 rc-update add dhcpcd default
 rc-update add shell default
+rc-update add cgroups default
 
 # ===================================================================
 
