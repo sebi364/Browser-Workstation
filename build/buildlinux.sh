@@ -14,7 +14,7 @@ cp ./bin/* "$BUILD_DIR/rootfs/bin/"
 chroot "$BUILD_DIR/rootfs/" /bin/sh /bin/install
 
 # convert to filesystem image file
-dd if=/dev/zero of="$BUILD_DIR/filesystem.img" bs=1M count=64
+dd if=/dev/zero of="$BUILD_DIR/filesystem.img" bs=1M count=512
 mke2fs -t ext2 -d "$BUILD_DIR/rootfs" "$BUILD_DIR/filesystem.img"
 
 # build webfs image
