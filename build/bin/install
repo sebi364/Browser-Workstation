@@ -11,7 +11,7 @@ EOF
 
 # ===================================================================
 
-apk add vim openssh dhcpcd bash openrc xterm podman
+apk add vim openssh dhcpcd bash openrc xterm gdb
 
 # ===================================================================
 
